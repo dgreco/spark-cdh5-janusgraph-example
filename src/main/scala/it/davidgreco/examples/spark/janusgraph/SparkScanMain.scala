@@ -27,7 +27,10 @@ object SparkScanMain extends App {
 
   val uberJarLocation: String = {
     val location = getJar(SparkMain.getClass)
-    if (new File(location).isDirectory) s"${System.getProperty("user.dir")}/assembly/target/scala-2.11/spark-cdh5-janusgraph-example-assembly-1.0.jar" else location
+    if (new File(location).isDirectory)
+      s"${System.getProperty("user.dir")}/assembly/target/scala-2.11/spark-cdh5-janusgraph-example-assembly-1.0.jar"
+    else
+      location
   }
 
   if (master.isEmpty) {
