@@ -1,4 +1,4 @@
-package it.davidgreco.examples.spark
+package it.davidgreco.examples.spark.janusgraph
 
 import java.io.File
 
@@ -21,13 +21,13 @@ object SparkScanMain extends App {
 
   val yarn = true
 
-  val sparkConf: SparkConf = new SparkConf().setAppName("spark-cdh5-template-yarn")
+  val sparkConf: SparkConf = new SparkConf()
 
   val master: Option[String] = sparkConf.getOption("spark.master")
 
   val uberJarLocation: String = {
     val location = getJar(SparkMain.getClass)
-    if (new File(location).isDirectory) s"${System.getProperty("user.dir")}/assembly/target/scala-2.11/spark-cdh5-janusgraph-example-assembly.jar" else location
+    if (new File(location).isDirectory) s"${System.getProperty("user.dir")}/assembly/target/scala-2.11/spark-cdh5-janusgraph-example-assembly-1.0.jar" else location
   }
 
   if (master.isEmpty) {
@@ -38,7 +38,7 @@ object SparkScanMain extends App {
     if (yarn) {
       val _ = sparkConf.
         setMaster("yarn").
-        setAppName("spark-cdh5-template-yarn").
+        setAppName("spark-cdh5-janusgraph-example-yarn").
         setJars(List(uberJarLocation)).
         set("spark.yarn.jars", "local:/opt/cloudera/parcels/SPARK2/lib/spark2/jars/*").
         set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
@@ -52,7 +52,7 @@ object SparkScanMain extends App {
         set("spark.executor.extraClassPath", "/etc/hbase/conf")
     } else {
       val _ = sparkConf.
-        setAppName("spark-cdh5-template-local").
+        setAppName("spark-cdh5-janusgraph-example-local").
         setMaster("local")
     }
   }

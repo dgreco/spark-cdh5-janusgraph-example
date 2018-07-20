@@ -1,4 +1,4 @@
-package it.davidgreco.examples.spark
+package it.davidgreco.examples.spark.janusgraph
 
 import java.io.File
 

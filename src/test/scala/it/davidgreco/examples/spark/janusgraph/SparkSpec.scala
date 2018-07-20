@@ -1,4 +1,4 @@
-package it.davidgreco.examples.spark
+package it.davidgreco.examples.spark.janusgraph
 
 import java.time.Instant
 import java.util.Date
@@ -9,10 +9,10 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.structure.T.label
-import org.apache.tinkerpop.gremlin.structure.{ Edge, Vertex }
+import org.apache.tinkerpop.gremlin.structure.{Edge, Vertex}
 import org.janusgraph.core.schema.JanusGraphManagement
-import org.janusgraph.core.{ Cardinality, JanusGraphFactory, Multiplicity }
-import org.scalatest.{ BeforeAndAfterAll, MustMatchers, WordSpec }
+import org.janusgraph.core.{Cardinality, JanusGraphFactory, Multiplicity}
+import org.scalatest.{BeforeAndAfterAll, MustMatchers, WordSpec}
 
 import scala.collection.immutable.Stream.Empty
 
