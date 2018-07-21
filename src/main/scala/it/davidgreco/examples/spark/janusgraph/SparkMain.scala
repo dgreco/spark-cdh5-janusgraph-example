@@ -81,6 +81,8 @@ object SparkMain extends App {
     mgmt.commit()
   } catch {
     case _: Throwable =>
+  } finally {
+    graph.close()
   }
 
   rdd foreachPartition {
