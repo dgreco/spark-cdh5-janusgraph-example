@@ -44,7 +44,7 @@ object SparkScanMain extends App {
         setAppName("spark-cdh5-janusgraph-example-yarn").
         setJars(List(uberJarLocation)).
         set("spark.yarn.jars", "local:/opt/cloudera/parcels/SPARK2/lib/spark2/jars/*").
-        //set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
+        set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
         set("spark.io.compression.codec", "lzf").
         set("spark.speculation", "true").
         set("spark.shuffle.manager", "sort").

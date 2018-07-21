@@ -60,7 +60,7 @@ object SparkMain extends App {
 
   private val sparkSession: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
 
-  private val rdd = sparkSession.sparkContext.parallelize[Int](1 to 10000000, 8)
+  private val rdd = sparkSession.sparkContext.parallelize[Int](1 to 1000000, 8)
 
   private lazy val graph = {
     val builder = JanusGraphFactory.build.set("storage.backend", "hbase").set("storage.hostname", "snowwhite.fairytales")
@@ -94,7 +94,7 @@ object SparkMain extends App {
           i =>
             val vertex: Vertex = graph.addVertex(label, "NODE")
             val _ = vertex.property("ID", i.toLong)
-            if (i % 10000 == 0) {
+            if (i % 1000 == 0) {
               println(i)
               graph.tx.commit()
             }
