@@ -44,14 +44,14 @@ object SparkScanMain extends App {
         setAppName("spark-cdh5-janusgraph-example-yarn").
         setJars(List(uberJarLocation)).
         set("spark.yarn.jars", "local:/opt/cloudera/parcels/SPARK2/lib/spark2/jars/*").
-        set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
+        //set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").
         set("spark.io.compression.codec", "lzf").
         set("spark.speculation", "true").
         set("spark.shuffle.manager", "sort").
         set("spark.shuffle.service.enabled", "true").
         set("spark.dynamicAllocation.enabled", "true").
-        set("spark.executor.cores", Integer.toString(1)).
-        set("spark.executor.memory", "512m").
+        set("spark.executor.cores", Integer.toString(2)).
+        set("spark.executor.memory", "2048m").
         set("spark.executor.extraClassPath", "/etc/hbase/conf")
     } else {
       val _ = sparkConf.
@@ -73,8 +73,6 @@ object SparkScanMain extends App {
   conf.setProperty("janusgraphmr.ioformat.conf.storage.hostname", "snowwhite.fairytales")
 
   conf.setProperty("janusgraphmr.ioformat.conf.storage.hbase.table", "janusgraph")
-
-  conf.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
   private val sparkSession: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
 

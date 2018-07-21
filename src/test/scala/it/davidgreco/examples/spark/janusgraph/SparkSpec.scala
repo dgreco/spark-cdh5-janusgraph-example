@@ -9,10 +9,10 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.structure.T.label
-import org.apache.tinkerpop.gremlin.structure.{Edge, Vertex}
+import org.apache.tinkerpop.gremlin.structure.{ Edge, Vertex }
 import org.janusgraph.core.schema.JanusGraphManagement
-import org.janusgraph.core.{Cardinality, JanusGraphFactory, Multiplicity}
-import org.scalatest.{BeforeAndAfterAll, MustMatchers, WordSpec}
+import org.janusgraph.core.{ Cardinality, JanusGraphFactory, Multiplicity }
+import org.scalatest.{ BeforeAndAfterAll, MustMatchers, WordSpec }
 
 import scala.collection.immutable.Stream.Empty
 
@@ -34,8 +34,7 @@ class SparkSpec extends WordSpec with MustMatchers with BeforeAndAfterAll {
     val _ = hbaseUtil.startMiniCluster(1)
     SparkSpec.connection = Some(hbaseUtil.getConnection)
     val conf = new SparkConf().
-      setAppName("spark-cdh5-template-local-test").
-      setMaster("local[4]")
+      setMaster("local")
     sparkSession = SparkSession.builder().config(conf).getOrCreate()
     ()
   }
@@ -100,7 +99,7 @@ class SparkSpec extends WordSpec with MustMatchers with BeforeAndAfterAll {
         println(v.properties().asScala.toList)
       })
 
-      val v1l = g.V().has("PSTN", P.eq("063387273")).next()
+      val v1l = g.V().has("PSTN", P.eq("063397771")).next()
 
       graph.close()
     }
