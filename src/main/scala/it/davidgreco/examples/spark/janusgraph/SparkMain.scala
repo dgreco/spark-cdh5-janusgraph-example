@@ -4,10 +4,13 @@ import java.io.File
 
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import org.apache.tinkerpop.gremlin.process.traversal.P
 import org.apache.tinkerpop.gremlin.structure.T.label
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.janusgraph.core.schema.JanusGraphManagement
 import org.janusgraph.core.{ Cardinality, JanusGraphFactory, Multiplicity }
+
+import scala.util.Random
 
 @SuppressWarnings(
   Array(
@@ -97,6 +100,35 @@ object SparkMain extends App {
             val vertex: Vertex = graph.addVertex(label, "NODE")
             val _ = vertex.property("ID", i.toLong)
             if (i % 1000 == 0) {
+              println(i)
+              graph.tx.commit()
+            }
+        }
+      } finally {
+        graph.tx().commit()
+        graph.close()
+      }
+
+  }
+
+  rdd foreachPartition {
+    iter =>
+      lazy val (graph, g) = {
+        val builder = JanusGraphFactory.build.set("storage.backend", "hbase").set("storage.hostname", "snowwhite.fairytales")
+        val graph = builder.open()
+        val g = graph.traversal()
+        (graph, g)
+      }
+      try {
+        iter.foreach {
+          i =>
+            val vertex1: Vertex = g.V().hasLabel("NODE").has("ID", P.eq(i)).next()
+            for (j <- 1 to 10) {
+              val index = Random.nextInt(1000000) + 1
+              val vertex2: Vertex = g.V().hasLabel("NODE").has("ID", P.eq(index)).next()
+              vertex1.addEdge("LINKED_TO", vertex2)
+            }
+            if (i % 100 == 0) {
               println(i)
               graph.tx.commit()
             }
