@@ -14,8 +14,6 @@ scalaVersion in ThisBuild := "2.11.11"
 
 scalastyleFailOnError := true
 
-dependencyUpdatesFilter -= moduleFilter(organization = "org.scala-lang")
-
 scalacOptions ++= Seq(
   "-deprecation",
   "-encoding", "UTF-8", // yes, this is 2 args
@@ -110,7 +108,6 @@ lazy val root = (project in file(".")).
       hadoopHBaseExcludes("org.apache.hadoop" % "hadoop-mapreduce-client-jobclient" % hadoopVersion % "test" classifier "tests")
     )
   ).
-  enablePlugins(JavaAppPackaging).
   disablePlugins(AssemblyPlugin)
 
 lazy val projectAssembly = (project in file("assembly")).
@@ -183,13 +180,13 @@ fork := true
 parallelExecution in Test := false
 
 val assemblyDependencies = (_: String) => Seq(
-  "org.janusgraph" % "janusgraph-hbase" % "0.3.0-SNAPSHOT"
+  "org.janusgraph" % "janusgraph-hbase" % "0.3.0"
     exclude("org.apache.tinkerpop", "gremlin-groovy")
     exclude("org.codehaus.groovy", "*")
     exclude("org.slf4j", "slf4j-log4j12")
     exclude("org.slf4j", "jcl-over-slf4j")
     exclude("commons-logging", "commons-logging"),
-  "org.janusgraph" % "janusgraph-hadoop-core" % "0.3.0-SNAPSHOT"
+  "org.janusgraph" % "janusgraph-hadoop-core" % "0.3.0"
     exclude("org.apache.spark", "*")
     exclude("org.apache.hadoop", "*")
     exclude("org.apache.tinkerpop", "gremlin-groovy")
@@ -203,15 +200,3 @@ val assemblyDependencies = (_: String) => Seq(
   hbaseExcludes("org.apache.hbase" % "hbase-common" % hbaseVersion),
   hbaseExcludes("org.apache.hbase" % "hbase-hadoop-compat" % hbaseVersion)
 )
-
-mappings in Universal := {
-  val universalMappings = (mappings in Universal).value
-  val filtered = universalMappings filter {
-    case (_, n) =>
-      !n.endsWith(s"${organization.value}.${name.value}-${version.value}.jar")
-  }
-  val fatJar: File = new File(s"${System.getProperty("user.dir")}/assembly/target/scala-${scalaBinaryVersion.value}/$assemblyName-${version.value}.jar")
-  filtered :+ (fatJar -> ("lib/" + fatJar.getName))
-}
-
-scriptClasspath ++= Seq(s"$assemblyName-${version.value}.jar")

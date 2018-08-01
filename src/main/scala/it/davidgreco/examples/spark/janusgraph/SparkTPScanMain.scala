@@ -3,21 +3,18 @@ package it.davidgreco.examples.spark.janusgraph
 import java.io.File
 
 import org.apache.commons.configuration.{ BaseConfiguration, Configuration }
-import org.apache.hadoop.io.NullWritable
-import org.apache.hadoop.mapreduce.InputFormat
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
-import org.apache.tinkerpop.gremlin.hadoop.Constants
-import org.apache.tinkerpop.gremlin.hadoop.structure.io.VertexWritable
-import org.apache.tinkerpop.gremlin.hadoop.structure.util.ConfUtil
+import org.apache.tinkerpop.gremlin.spark.process.computer.SparkGraphComputer
+import org.apache.tinkerpop.gremlin.spark.structure.Spark
+import org.apache.tinkerpop.gremlin.structure.util.GraphFactory
 
 @SuppressWarnings(
   Array(
     "org.wartremover.warts.AsInstanceOf",
     "org.wartremover.warts.Null",
     "org.wartremover.warts.Equals"))
-object SparkScanMain extends App {
+object SparkTPScanMain extends App {
 
   val yarn = true
 
@@ -60,34 +57,48 @@ object SparkScanMain extends App {
     }
   }
 
-  private val conf: Configuration = new BaseConfiguration()
-
-  conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.hadoop.structure.HadoopGraph")
-
-  conf.setProperty("gremlin.hadoop.graphReader", "org.janusgraph.hadoop.formats.hbase.HBaseInputFormat")
-
-  conf.setProperty("gremlin.hadoop.graphWriter", "org.apache.tinkerpop.gremlin.hadoop.structure.io.gryo.GryoOutputFormat")
-
-  conf.setProperty("janusgraphmr.ioformat.conf.storage.backend", "hbase")
-
-  conf.setProperty("janusgraphmr.ioformat.conf.storage.hostname", "snowwhite.fairytales")
-
-  conf.setProperty("janusgraphmr.ioformat.conf.storage.hbase.table", "janusgraph")
-
   private val sparkSession: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
 
-  private val hadoopConfiguration = ConfUtil.makeHadoopConfiguration(conf)
+  private val gremlinSpark = Spark.create(sparkSession.sparkContext)
 
-  private val rdd: RDD[(NullWritable, VertexWritable)] =
-    sparkSession.sparkContext.
-      newAPIHadoopRDD(
-        hadoopConfiguration,
-        hadoopConfiguration.getClass(Constants.GREMLIN_HADOOP_GRAPH_READER, classOf[InputFormat[NullWritable, VertexWritable]]).
-          asInstanceOf[Class[InputFormat[NullWritable, VertexWritable]]],
-        classOf[NullWritable], classOf[VertexWritable])
+  private val sparkComputerConnection = GraphFactory.open(getConf())
 
-  println(rdd.map(_._2).count())
+  private val traversalSource = sparkComputerConnection.traversal().withComputer(classOf[SparkGraphComputer])
 
-  sparkSession.sparkContext.stop()
+  println(traversalSource.E().count().next())
+
+  traversalSource.close()
+
+  sparkComputerConnection.close()
+
+  sparkSession.stop()
+
+  private def getConf() = {
+    val conf: Configuration = new BaseConfiguration()
+
+    conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.hadoop.structure.HadoopGraph")
+
+    conf.setProperty("gremlin.hadoop.graphReader", "org.janusgraph.hadoop.formats.hbase.HBaseInputFormat")
+
+    conf.setProperty("gremlin.hadoop.graphWriter", "org.apache.tinkerpop.gremlin.hadoop.structure.io.gryo.GryoOutputFormat")
+
+    conf.setProperty("storage.backend", "hbase")
+
+    conf.setProperty("storage.hostname", "snowwhite.fairytales")
+
+    conf.setProperty("janusgraphmr.ioformat.conf.storage.backend", "hbase")
+
+    conf.setProperty("janusgraphmr.ioformat.conf.storage.hostname", "snowwhite.fairytales")
+
+    conf.setProperty("janusgraphmr.ioformat.conf.storage.hbase.table", "janusgraph")
+
+    conf.setProperty("spark.master", "local")
+
+    conf.setProperty("spark.executor.memory", "1g")
+
+    conf.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+
+    conf
+  }
 
 }
