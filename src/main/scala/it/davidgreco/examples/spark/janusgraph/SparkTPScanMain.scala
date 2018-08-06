@@ -65,7 +65,7 @@ object SparkTPScanMain extends App {
 
   private val traversalSource = sparkComputerConnection.traversal().withComputer(classOf[SparkGraphComputer])
 
-  println(traversalSource.E().count().next())
+  println(traversalSource.V().count().next())
 
   traversalSource.close()
 
@@ -79,9 +79,7 @@ object SparkTPScanMain extends App {
     conf.setProperty("gremlin.graph", "org.apache.tinkerpop.gremlin.hadoop.structure.HadoopGraph")
 
     conf.setProperty("gremlin.hadoop.graphReader", "org.janusgraph.hadoop.formats.hbase.HBaseInputFormat")
-
-    conf.setProperty("gremlin.hadoop.graphWriter", "org.apache.tinkerpop.gremlin.hadoop.structure.io.gryo.GryoOutputFormat")
-
+    
     conf.setProperty("storage.backend", "hbase")
 
     conf.setProperty("storage.hostname", "snowwhite.fairytales")
@@ -91,12 +89,6 @@ object SparkTPScanMain extends App {
     conf.setProperty("janusgraphmr.ioformat.conf.storage.hostname", "snowwhite.fairytales")
 
     conf.setProperty("janusgraphmr.ioformat.conf.storage.hbase.table", "janusgraph")
-
-    conf.setProperty("spark.master", "local")
-
-    conf.setProperty("spark.executor.memory", "1g")
-
-    conf.setProperty("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
     conf
   }
